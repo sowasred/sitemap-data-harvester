@@ -3,6 +3,7 @@ const xml2js = require('xml2js');
 const puppeteerUtils = require('../utils/puppeteerUtils');
 
 let combinedContent = '';
+let seenContent = new Set();
 
 exports.validateSitemap = async (url) => {
   try {
@@ -34,7 +35,10 @@ exports.extractContent = async (url) => {
     combinedContent = '';
     for (let i = 0; i < urls.length; i++) {
       const pageContent = await puppeteerUtils.getPageContent(urls[i]);
-      combinedContent += `\n\n--- Page ${i + 1}: ${urls[i]} ---\n\n${pageContent}`;
+      const uniqueContent = deduplicateContent(pageContent);
+      if (uniqueContent) {
+        combinedContent += `\n\n--- Page ${i + 1}: ${urls[i]} ---\n\n${uniqueContent}`;
+      }
     }
     
     return { message: 'Content extracted successfully', totalPages: urls.length };
@@ -42,6 +46,20 @@ exports.extractContent = async (url) => {
     throw new Error('Failed to extract content: ' + error.message);
   }
 };
+
+function deduplicateContent(content) {
+  const paragraphs = content.split('\n').filter(p => p.trim() !== '');
+  let uniqueParagraphs = [];
+
+  for (let paragraph of paragraphs) {
+    if (!seenContent.has(paragraph)) {
+      seenContent.add(paragraph);
+      uniqueParagraphs.push(paragraph);
+    }
+  }
+
+  return uniqueParagraphs.join('\n');
+}
 
 exports.getCombinedContent = () => {
   return combinedContent;
