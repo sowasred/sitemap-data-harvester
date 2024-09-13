@@ -41,7 +41,9 @@ exports.downloadContent = async (req, res) => {
     const customFileName = `${siteName}-${sitemapName}.txt`;
 
     res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename=${customFileName}`);
+    res.setHeader('Content-Disposition', `attachment; filename="${customFileName}"`);
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+
     res.send(content);
   } catch (error) {
     res.status(400).json({ error: error.message });
