@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/validate-sitemap', sitemapController.validateSitemap);
 router.post('/extract-content', sitemapController.extractContent);
-router.get('/download-content', sitemapController.downloadContent);
+router.post('/download-content', sitemapController.downloadContent);
 
 module.exports = router;
